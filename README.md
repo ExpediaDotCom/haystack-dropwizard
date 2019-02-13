@@ -62,6 +62,34 @@ public class FrontendApplication extends Application<HelloWorldConfiguration> {
     }
 }
 ```
+
+Also in the configuration yaml file for the application usually named config.yml, one needs to add the following snippet
+with appropriate configs:
+
+For local dispatch, means the traces will not be sent to the haystack server instead they will only be written to local file
+```
+tracer:
+  serviceName: Backend
+  enabled: true
+  dispatchers:
+    - type: logger
+      loggerName: dispatcher
+```
+
+For remote dispatch, means the traces will be sent to the haystack server using the haystack client
+```
+tracer:
+  serviceName: Backend
+  enabled: true
+  dispatchers:
+    - type: remote
+      client:
+        type: agent
+        host: localhost
+        format:
+          type: protobuf
+```
+
 To find the full example check this example of a simple application with client and server side tracing enabled,
 [Haystack Dropwizard Example](https://github.com/ExpediaDotCom/haystack-dropwizard-example).
 
