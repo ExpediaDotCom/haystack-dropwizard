@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/ExpediaDotCom/haystack-dropwizard.svg?branch=master)](https://travis-ci.org/ExpediaDotCom/haystack-dropwizard)
+[![License](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/ExpediaDotCom/haystack/blob/master/LICENSE)
+
 ## Table of Contents
 
 - [Instrumenting dropwizard applications](#Instrumenting-dropwizard-applications)
