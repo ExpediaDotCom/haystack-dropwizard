@@ -21,7 +21,8 @@ If you need additional information, please read the subsequent sections in this 
 # Haystack dropwizard dependency
 Add the following dependency to your application.
 
-```<dependency>
+```
+   <dependency>
         <groupId>com.expedia.www</groupId>
         <artifactId>haystack-dropwizard</artifactId>
         <version>${haystack-dropwizard.version}</version>
