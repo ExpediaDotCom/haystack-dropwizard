@@ -16,39 +16,20 @@
  */
 package com.expedia.haystack.dropwizard.bundle;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.File;
-import java.util.Collections;
-
-import javax.validation.Validator;
-
-import com.codahale.metrics.MetricRegistry;
-import com.expedia.haystack.dropwizard.configuration.DropwizardMetricsFactory;
-import com.expedia.haystack.dropwizard.configuration.MetricsFactory;
 import com.expedia.haystack.dropwizard.configuration.TracerFactory;
 import com.expedia.www.haystack.client.Tracer;
-import com.expedia.www.haystack.client.metrics.Metrics;
-import com.expedia.www.haystack.client.metrics.MetricsRegistry;
-import com.expedia.www.haystack.client.metrics.dropwizard.DropwizardMetricsRegistry;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.io.Resources;
-
-import io.dropwizard.Configuration;
-import io.dropwizard.configuration.YamlConfigurationFactory;
-import io.dropwizard.jackson.Jackson;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
-import io.dropwizard.jersey.validation.Validators;
-import io.dropwizard.jetty.setup.ServletEnvironment;
 import io.dropwizard.setup.Environment;
-import static org.mockito.Mockito.*;
-
 import io.opentracing.contrib.jaxrs2.client.ClientTracingFeature;
-import io.opentracing.contrib.jaxrs2.server.ServerTracingDynamicFeature;
 import io.opentracing.contrib.jaxrs2.server.SpanFinishingFilter;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.*;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 public class HaystackTracerBundleTest {
 
