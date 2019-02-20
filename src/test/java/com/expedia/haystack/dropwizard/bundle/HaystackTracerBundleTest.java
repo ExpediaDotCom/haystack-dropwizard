@@ -16,10 +16,8 @@
  */
 package com.expedia.haystack.dropwizard.bundle;
 
-import com.expedia.haystack.dropwizard.configuration.TracerFactory;
-import com.expedia.www.haystack.client.Tracer;
-import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.setup.Environment;
+import io.opentracing.Tracer;
 import io.opentracing.contrib.jaxrs2.client.ClientTracingFeature;
 import io.opentracing.contrib.jaxrs2.server.SpanFinishingFilter;
 import org.junit.Before;
@@ -37,13 +35,7 @@ public class HaystackTracerBundleTest {
     Environment environment;
 
     @Mock
-    JerseyEnvironment jerseyEnvironment;
-
-    @Mock
     Tracer tracer;
-
-    @Mock
-    TracerFactory tracerFactory;
 
     @Before
     public void setup() {
@@ -54,8 +46,7 @@ public class HaystackTracerBundleTest {
     public void testCreateClientTracingFeature() throws Exception {
         final HaystackTracerBundle<Traceable> haystackTracerBundle = new HaystackTracerBundle<>();
 
-        when(environment.jersey()).thenReturn(jerseyEnvironment);
-        when(jerseyEnvironment.getProperty(Tracer.class.getName())).thenReturn(tracer);
+        when(environment.jersey().getProperty(Tracer.class.getName())).thenReturn(tracer);
 
         final ClientTracingFeature clientTracingFeature = haystackTracerBundle.clientTracingFeature(environment);
         assertThat(clientTracingFeature.getClass().getName().equals(ClientTracingFeature.class.getName()));
@@ -64,7 +55,7 @@ public class HaystackTracerBundleTest {
     @Test
     public void testRun() throws Exception {
         final HaystackTracerBundle<Traceable> haystackTracerBundle = new HaystackTracerBundle<>();
-        Traceable traceable = mock(Traceable.class, RETURNS_DEEP_STUBS);
+        final Traceable traceable = mock(Traceable.class, RETURNS_DEEP_STUBS);
 
         when(traceable.getTracerFactory().build(environment)).thenReturn(tracer);
 
