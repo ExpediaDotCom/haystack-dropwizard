@@ -49,7 +49,7 @@
 
     <dependency>
       <groupId>com.expedia.www</groupId>
-      <artifactId>haystack-client-dropwizard-metrics</artifactId>
+      <artifactId>haystack-client-metrics-dropwizard</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
 
