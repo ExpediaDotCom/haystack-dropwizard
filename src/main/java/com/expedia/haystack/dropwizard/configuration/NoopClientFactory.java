@@ -16,9 +16,9 @@
  */
 package com.expedia.haystack.dropwizard.configuration;
 
-import com.expedia.www.haystack.client.dispatchers.clients.Client;
 import com.expedia.www.haystack.client.dispatchers.clients.NoopClient;
 import com.expedia.www.haystack.client.metrics.MetricsRegistry;
+import com.expedia.www.haystack.remote.clients.Client;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.dropwizard.setup.Environment;
 
