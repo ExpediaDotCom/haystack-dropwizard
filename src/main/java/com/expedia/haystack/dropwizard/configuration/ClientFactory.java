@@ -16,8 +16,8 @@
  */
 package com.expedia.haystack.dropwizard.configuration;
 
-import com.expedia.www.haystack.client.dispatchers.clients.Client;
 import com.expedia.www.haystack.client.metrics.MetricsRegistry;
+import com.expedia.www.haystack.remote.clients.Client;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
