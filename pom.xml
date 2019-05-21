@@ -11,8 +11,8 @@
   </parent>
 
   <artifactId>haystack-dropwizard</artifactId>
-  <version>0.2.2-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <version>0.2.3-SNAPSHOT</version>
+  <packaging>jar</packaging>git
   <name>haystack-dropwizard</name>
   <description>Dropwizard bindings for integrating haystack client.</description>
   <url>https://github.com/ExpediaDotCom/haystack-dropwizard</url>
