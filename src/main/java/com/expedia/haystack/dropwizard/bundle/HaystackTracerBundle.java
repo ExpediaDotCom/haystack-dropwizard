@@ -16,9 +16,10 @@
  */
 package com.expedia.haystack.dropwizard.bundle;
 
+import com.expedia.haystack.dropwizard.jackson.HaystackModule;
 import com.expedia.haystack.dropwizard.jackson.IdGeneratorDeserializer;
 import com.expedia.www.haystack.client.idgenerators.IdGenerator;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.Module;
 import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -34,11 +35,11 @@ import org.apache.commons.lang3.Validate;
 
 public class HaystackTracerBundle<T extends Traceable> implements ConfiguredBundle<T> {
 
-    private final IdGeneratorDeserializer idGeneratorDeserializer;
+    private final Module haystackModule;
     private final Function<Tracer, ServerTracingDynamicFeature.Builder> serverTracingBuilder;
 
     public HaystackTracerBundle() {
-        this(new IdGeneratorDeserializer(), ServerTracingDynamicFeature.Builder::new);
+        this(new HaystackModule(), ServerTracingDynamicFeature.Builder::new);
     }
 
     /**
@@ -49,12 +50,12 @@ public class HaystackTracerBundle<T extends Traceable> implements ConfiguredBund
      * <p>Customizing the {@link ServerTracingDynamicFeature.Builder} is necessary if you want to use anything other than
      * the standard spanDecorators, serializationSpanDecorators, skipPattern etc</p>
      *
-     * @param idGeneratorDeserializer a customized {@link IdGeneratorDeserializer}
+     * @param haystackModule a customized {@link HaystackModule}
      * @param serverTracingBuilder a customized {@link ServerTracingDynamicFeature.Builder}
      */
-    public HaystackTracerBundle(IdGeneratorDeserializer idGeneratorDeserializer,
+    public HaystackTracerBundle(Module haystackModule,
                                 Function<Tracer, ServerTracingDynamicFeature.Builder> serverTracingBuilder) {
-        this.idGeneratorDeserializer = idGeneratorDeserializer;
+        this.haystackModule = haystackModule;
         this.serverTracingBuilder = serverTracingBuilder;
     }
 
@@ -62,10 +63,6 @@ public class HaystackTracerBundle<T extends Traceable> implements ConfiguredBund
     public void run(T traceable, Environment environment) {
         Validate.notNull(traceable);
         Validate.notNull(environment);
-
-        environment
-                .getObjectMapper()
-                .registerModule(new SimpleModule().addDeserializer(IdGenerator.class, idGeneratorDeserializer));
 
         final Tracer tracer = traceable.getTracerFactory().build(environment);
 
@@ -83,7 +80,9 @@ public class HaystackTracerBundle<T extends Traceable> implements ConfiguredBund
 
     @Override
     public void initialize(Bootstrap bootstrap) {
-        //no-op
+        bootstrap
+                .getObjectMapper()
+                .registerModule(haystackModule);
     }
 
     public ClientTracingFeature clientTracingFeature(Environment environment) {
