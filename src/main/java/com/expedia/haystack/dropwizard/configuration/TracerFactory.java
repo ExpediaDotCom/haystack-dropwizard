@@ -16,25 +16,23 @@
  */
 package com.expedia.haystack.dropwizard.configuration;
 
-import java.util.List;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotEmpty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.expedia.www.haystack.client.Tracer;
 import com.expedia.www.haystack.client.dispatchers.ChainedDispatcher;
 import com.expedia.www.haystack.client.dispatchers.Dispatcher;
+import com.expedia.www.haystack.client.idgenerators.IdGenerator;
 import com.expedia.www.haystack.client.metrics.MetricsRegistry;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
-
 import io.dropwizard.setup.Environment;
 import io.opentracing.noop.NoopTracerFactory;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 public class TracerFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(TracerFactory.class);
@@ -52,6 +50,9 @@ public class TracerFactory {
     @Valid
     @NotEmpty
     private List<DispatcherFactory> dispatchers = ImmutableList.of(new RemoteDispatcherFactory());
+
+    @Valid
+    private IdGenerator idGenerator;
 
     public io.opentracing.Tracer build(Environment environment) {
         if (!enabled) {
@@ -71,8 +72,10 @@ public class TracerFactory {
             dispatcher = dispatchers.get(0).build(environment, registry);
         }
 
-        final Tracer.Builder builder = new Tracer.Builder(registry, serviceName, dispatcher);
-        return builder.build();
+        return new Tracer
+                .Builder(registry, serviceName, dispatcher)
+                .withIdGenerator(idGenerator)
+                .build();
     }
 
     @Override
@@ -121,5 +124,14 @@ public class TracerFactory {
     @JsonProperty
     public void setDispatchers(List<DispatcherFactory> dispatchers) {
         this.dispatchers = dispatchers;
+    }
+
+    public IdGenerator idGenerator() {
+        return idGenerator;
+    }
+
+    @JsonProperty
+    public void setIdGenerator(IdGenerator idGenerator) {
+        this.idGenerator = idGenerator;
     }
 }
