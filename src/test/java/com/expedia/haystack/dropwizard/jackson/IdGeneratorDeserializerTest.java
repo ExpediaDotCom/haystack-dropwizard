@@ -21,7 +21,7 @@ public class IdGeneratorDeserializerTest {
 
     private final ObjectMapper objectMapper = Jackson
             .newObjectMapper()
-            .registerModule(new SimpleModule().addDeserializer(IdGenerator.class, new IdGeneratorDeserializer()));
+            .registerModule(new HaystackModule());
 
     @Test
     public void canDeserializeLongIdGenerator() throws IOException {
@@ -66,11 +66,10 @@ public class IdGeneratorDeserializerTest {
         ObjectMapper objectMapper = Jackson
                 .newObjectMapper()
                 .registerModule(
-                        new SimpleModule()
-                                .addDeserializer(
-                                        IdGenerator.class,
-                                        new IdGeneratorDeserializer()
-                                                .register("incrementing", new IncrementingIdGenerator())));
+                        new HaystackModule(
+                                new IdGeneratorDeserializer()
+                                        .register("incrementing", new IncrementingIdGenerator()))
+                );
 
         TestConfiguration testConfiguration = objectMapper
                 .readValue("{ \"idGenerator\": \"incrementing\" }", TestConfiguration.class);
