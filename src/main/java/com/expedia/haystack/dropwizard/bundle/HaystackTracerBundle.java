@@ -16,6 +16,10 @@
  */
 package com.expedia.haystack.dropwizard.bundle;
 
+import com.expedia.haystack.dropwizard.jackson.HaystackModule;
+import com.expedia.haystack.dropwizard.jackson.IdGeneratorDeserializer;
+import com.expedia.www.haystack.client.idgenerators.IdGenerator;
+import com.fasterxml.jackson.databind.Module;
 import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -25,10 +29,35 @@ import io.opentracing.contrib.jaxrs2.server.ServerTracingDynamicFeature;
 import io.opentracing.contrib.jaxrs2.server.SpanFinishingFilter;
 import io.opentracing.noop.NoopTracerFactory;
 import java.util.EnumSet;
+import java.util.function.Function;
 import javax.servlet.DispatcherType;
 import org.apache.commons.lang3.Validate;
 
 public class HaystackTracerBundle<T extends Traceable> implements ConfiguredBundle<T> {
+
+    private final Module haystackModule;
+    private final Function<Tracer, ServerTracingDynamicFeature.Builder> serverTracingBuilder;
+
+    public HaystackTracerBundle() {
+        this(new HaystackModule(), ServerTracingDynamicFeature.Builder::new);
+    }
+
+    /**
+     * Allow for registration of a customized {@link IdGeneratorDeserializer} and/or
+     * {@link ServerTracingDynamicFeature.Builder}.
+     *
+     * <p>Customizing the {@link IdGeneratorDeserializer} is necessary if you've written your own {@link IdGenerator}.</p>
+     * <p>Customizing the {@link ServerTracingDynamicFeature.Builder} is necessary if you want to use anything other than
+     * the standard spanDecorators, serializationSpanDecorators, skipPattern etc</p>
+     *
+     * @param haystackModule a customized {@link HaystackModule}
+     * @param serverTracingBuilder a customized {@link ServerTracingDynamicFeature.Builder}
+     */
+    public HaystackTracerBundle(Module haystackModule,
+                                Function<Tracer, ServerTracingDynamicFeature.Builder> serverTracingBuilder) {
+        this.haystackModule = haystackModule;
+        this.serverTracingBuilder = serverTracingBuilder;
+    }
 
     @Override
     public void run(T traceable, Environment environment) {
@@ -37,8 +66,8 @@ public class HaystackTracerBundle<T extends Traceable> implements ConfiguredBund
 
         final Tracer tracer = traceable.getTracerFactory().build(environment);
 
-        final ServerTracingDynamicFeature tracingDynamicFeature = new ServerTracingDynamicFeature
-                .Builder(tracer)
+        final ServerTracingDynamicFeature tracingDynamicFeature = serverTracingBuilder
+                .apply(tracer)
                 .withTraceSerialization(false).build();
         environment.jersey().register(tracingDynamicFeature);
 
@@ -51,7 +80,9 @@ public class HaystackTracerBundle<T extends Traceable> implements ConfiguredBund
 
     @Override
     public void initialize(Bootstrap bootstrap) {
-        //no-op
+        bootstrap
+                .getObjectMapper()
+                .registerModule(haystackModule);
     }
 
     public ClientTracingFeature clientTracingFeature(Environment environment) {
