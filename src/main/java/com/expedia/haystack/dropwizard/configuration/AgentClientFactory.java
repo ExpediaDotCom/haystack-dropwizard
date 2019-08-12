@@ -90,7 +90,7 @@ public class AgentClientFactory extends BaseClientFactory {
     @NotNull
     @Min(1)
     @Max(65535)
-    private Integer port = 34000;
+    private Integer port = 35000;
 
     @Nullable
     private Long keepAliveTimeMS;
