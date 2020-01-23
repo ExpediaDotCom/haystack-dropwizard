@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia, Inc.
+ * Copyright 2020 Expedia, Inc.
  *
  *       Licensed under the Apache License, Version 2.0 (the "License");
  *       you may not use this file except in compliance with the License.
@@ -14,14 +14,24 @@
  *       limitations under the License.
  *
  */
-package com.expedia.haystack.dropwizard.bundle;
 
-import com.expedia.haystack.dropwizard.configuration.BlobFactory;
-import com.expedia.haystack.dropwizard.configuration.TracerFactory;
+package com.expedia.haystack.dropwizard.configuration;
 
-public interface Traceable {
-    TracerFactory getTracerFactory();
-    default BlobFactory getBlobFactory() {
-        return new BlobFactory();
+import com.expedia.blobs.core.ContentType;
+
+public class BlobContent {
+    private final byte[] data;
+    private final ContentType contentType;
+
+    public BlobContent(final byte[] data, final ContentType contentType) {
+        this.data = data;
+        this.contentType = contentType;
+    }
+    public byte[] getData() {
+        return data;
+    }
+
+    public ContentType getContentType() {
+        return contentType;
     }
 }

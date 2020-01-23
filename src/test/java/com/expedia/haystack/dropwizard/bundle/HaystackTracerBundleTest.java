@@ -16,6 +16,7 @@
  */
 package com.expedia.haystack.dropwizard.bundle;
 
+import com.expedia.haystack.dropwizard.configuration.BlobFactory;
 import io.dropwizard.setup.Environment;
 import io.opentracing.Tracer;
 import io.opentracing.contrib.jaxrs2.client.ClientTracingFeature;
@@ -37,6 +38,9 @@ public class HaystackTracerBundleTest {
     @Mock
     Tracer tracer;
 
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    Traceable traceable;
+
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
@@ -46,7 +50,10 @@ public class HaystackTracerBundleTest {
     public void testCreateClientTracingFeature() throws Exception {
         final HaystackTracerBundle<Traceable> haystackTracerBundle = new HaystackTracerBundle<>();
 
+        BlobFactory factory = new BlobFactory();
+        when(traceable.getBlobFactory()).thenReturn(factory);
         when(environment.jersey().getProperty(Tracer.class.getName())).thenReturn(tracer);
+        when(environment.jersey().getProperty(Tracer.class.getName() + ".blobs")).thenReturn(factory);
 
         final ClientTracingFeature clientTracingFeature = haystackTracerBundle.clientTracingFeature(environment);
         assertThat(clientTracingFeature.getClass().getName().equals(ClientTracingFeature.class.getName()));
