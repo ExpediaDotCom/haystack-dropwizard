@@ -16,6 +16,9 @@
  */
 package com.expedia.haystack.dropwizard.bundle;
 
+import com.expedia.haystack.dropwizard.configuration.BlobFactory;
+import com.expedia.haystack.dropwizard.decorators.BlobClientSpanDecorator;
+import com.expedia.haystack.dropwizard.decorators.BlobServerSpanDecorator;
 import com.expedia.haystack.dropwizard.jackson.HaystackModule;
 import com.expedia.haystack.dropwizard.jackson.IdGeneratorDeserializer;
 import com.expedia.www.haystack.client.idgenerators.IdGenerator;
@@ -24,14 +27,20 @@ import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.opentracing.Tracer;
+import io.opentracing.contrib.jaxrs2.client.ClientSpanDecorator;
 import io.opentracing.contrib.jaxrs2.client.ClientTracingFeature;
+import io.opentracing.contrib.jaxrs2.server.ServerSpanDecorator;
 import io.opentracing.contrib.jaxrs2.server.ServerTracingDynamicFeature;
 import io.opentracing.contrib.jaxrs2.server.SpanFinishingFilter;
 import io.opentracing.noop.NoopTracerFactory;
-import java.util.EnumSet;
-import java.util.function.Function;
-import javax.servlet.DispatcherType;
 import org.apache.commons.lang3.Validate;
+
+import javax.servlet.DispatcherType;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.function.Function;
 
 public class HaystackTracerBundle<T extends Traceable> implements ConfiguredBundle<T> {
 
@@ -45,12 +54,12 @@ public class HaystackTracerBundle<T extends Traceable> implements ConfiguredBund
     /**
      * Allow for registration of a customized {@link IdGeneratorDeserializer} and/or
      * {@link ServerTracingDynamicFeature.Builder}.
-     *
+     * <p>
      * <p>Customizing the {@link IdGeneratorDeserializer} is necessary if you've written your own {@link IdGenerator}.</p>
      * <p>Customizing the {@link ServerTracingDynamicFeature.Builder} is necessary if you want to use anything other than
      * the standard spanDecorators, serializationSpanDecorators, skipPattern etc</p>
      *
-     * @param haystackModule a customized {@link HaystackModule}
+     * @param haystackModule       a customized {@link HaystackModule}
      * @param serverTracingBuilder a customized {@link ServerTracingDynamicFeature.Builder}
      */
     public HaystackTracerBundle(Module haystackModule,
@@ -68,6 +77,10 @@ public class HaystackTracerBundle<T extends Traceable> implements ConfiguredBund
 
         final ServerTracingDynamicFeature tracingDynamicFeature = serverTracingBuilder
                 .apply(tracer)
+                .withDecorators(
+                        Arrays.asList(
+                                ServerSpanDecorator.STANDARD_TAGS,
+                                new BlobServerSpanDecorator(traceable.getBlobFactory())))
                 .withTraceSerialization(false).build();
         environment.jersey().register(tracingDynamicFeature);
 
@@ -75,6 +88,7 @@ public class HaystackTracerBundle<T extends Traceable> implements ConfiguredBund
                 .addFilter("SpanFinishingFilter", new SpanFinishingFilter(tracer))
                 .addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
 
+        environment.jersey().property(Tracer.class.getName() + ".blobs", traceable.getBlobFactory());
         environment.jersey().property(Tracer.class.getName(), tracer);
     }
 
@@ -85,13 +99,21 @@ public class HaystackTracerBundle<T extends Traceable> implements ConfiguredBund
                 .registerModule(haystackModule);
     }
 
-    public ClientTracingFeature clientTracingFeature(Environment environment) {
+    public ClientTracingFeature clientTracingFeature(final Environment environment) {
         Tracer tracer = environment.jersey().getProperty(Tracer.class.getName());
         if (tracer == null) {
             tracer = NoopTracerFactory.create();
         }
 
+        final BlobFactory blobs = environment.jersey().getProperty(Tracer.class.getName() + ".blobs");
+        final List<ClientSpanDecorator> decorators = new ArrayList<>(2);
+        decorators.add(ClientSpanDecorator.STANDARD_TAGS);
+        if (blobs.isEnabled()) {
+            decorators.add(new BlobClientSpanDecorator(blobs));
+        }
+
         return new ClientTracingFeature.Builder(tracer)
+                .withDecorators(decorators)
                 .withTraceSerialization(false)
                 .build();
     }

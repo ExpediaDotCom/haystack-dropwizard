@@ -27,16 +27,12 @@ import com.google.common.collect.ImmutableList;
 import io.dropwizard.setup.Environment;
 import io.opentracing.noop.NoopTracerFactory;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class TracerFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TracerFactory.class);
-
     @Valid
     @NotNull
     private MetricsFactory metrics = new DropwizardMetricsFactory();
@@ -81,9 +77,9 @@ public class TracerFactory {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("serviceName", serviceName)
-            .add("dispatchers", dispatchers)
-            .toString();
+                .add("serviceName", serviceName)
+                .add("dispatchers", dispatchers)
+                .toString();
     }
 
     @JsonProperty

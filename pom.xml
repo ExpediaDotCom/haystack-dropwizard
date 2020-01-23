@@ -7,11 +7,11 @@
   <parent>
     <groupId>com.expedia.www</groupId>
     <artifactId>haystack-client-java-parent</artifactId>
-    <version>0.2.9</version>
+    <version>0.3.0</version>
   </parent>
 
   <artifactId>haystack-dropwizard</artifactId>
-  <version>0.2.4-SNAPSHOT</version>
+  <version>0.3.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>haystack-dropwizard</name>
   <description>Dropwizard bindings for integrating haystack client.</description>
@@ -20,6 +20,7 @@
   <properties>
     <dropwizard.version>1.2.2</dropwizard.version>
     <io.opentracing.contrib-jaxrs2.version>0.1.4</io.opentracing.contrib-jaxrs2.version>
+    <blobs.version>1.1.0</blobs.version>
   </properties>
 
   <dependencyManagement>
@@ -92,6 +93,31 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <!-- blobs -->
+    <dependency>
+      <groupId>com.expedia.www</groupId>
+      <artifactId>blobs-core</artifactId>
+      <version>${blobs.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.expedia.www</groupId>
+      <artifactId>blobs-file-store</artifactId>
+      <version>${blobs.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.expedia.www</groupId>
+      <artifactId>blobs-agent-client</artifactId>
+      <version>${blobs.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.expedia.www</groupId>
+      <artifactId>haystack-blobs</artifactId>
+      <version>${blobs.version}</version>
     </dependency>
 
     <!-- Test dependencies -->
