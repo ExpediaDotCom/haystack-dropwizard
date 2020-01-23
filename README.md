@@ -97,6 +97,10 @@ tracer:
 To find the full example check this example of a simple application with client and server side tracing enabled,
 [Haystack Dropwizard Example](https://github.com/ExpediaDotCom/haystack-dropwizard-example).
 
+
+To check how blobs feature work with tracing, check this example of a simple application with client and server side
+[Haystack Blob Example](https://github.com/ExpediaDotCom/haystack-blob-example).
+
 ## See Also 
 This library is built on top of [Haystack client java](https://github.com/ExpediaDotCom/haystack-client-java).
 
