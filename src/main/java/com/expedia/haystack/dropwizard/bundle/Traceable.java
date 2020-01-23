@@ -21,5 +21,7 @@ import com.expedia.haystack.dropwizard.configuration.TracerFactory;
 
 public interface Traceable {
     TracerFactory getTracerFactory();
-    BlobFactory getBlobFactory();
+    default BlobFactory getBlobFactory() {
+        return new BlobFactory();
+    }
 }

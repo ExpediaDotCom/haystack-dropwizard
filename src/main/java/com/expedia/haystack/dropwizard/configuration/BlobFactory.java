@@ -31,7 +31,7 @@ import java.io.File;
 import java.util.function.Predicate;
 
 public class BlobFactory {
-    private final static Blobable DEFAULT_BLOBABLE = new Blobable() {};
+    final static Blobable DEFAULT_BLOBABLE = new Blobable() {};
 
     private Store store;
 
